@@ -5,472 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>생태계 먹이사슬 비율 모델링 • Food Chain Ratio Modeler</title>
   <style>
-    /* ------------------------------
-       Modern, full‑screen, responsive UI
-       Pure CSS (no external libs)
-    -------------------------------*/
     :root{
-      --bg: #0b1220;
-      --panel: #0f1a2f;
-      --muted: #96a0b5;
-      --text: #e8eefc;
-      --accent: #6dd5fa;  /* cyan */
-      --accent2:#2980b9;  /* deep blue */
-      --good: #21c58e;
-      --warn: #ffb020;
-      --danger:#ff5d5d;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 16px;
+      --bg:#0b1220;--panel:#0f1a2f;--muted:#96a0b5;--text:#e8eefc;--accent:#6dd5fa;--accent2:#2980b9;--radius:16px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Helvetica, Arial;
-      background: radial-gradient(1200px 800px at 80% -10%, rgba(109,213,250,.25), transparent 60%),
-                  radial-gradient(900px 700px at -20% 20%, rgba(41,128,185,.3), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-      display:flex; flex-direction:column;
-    }
-    header{
-      padding:24px clamp(16px,3vw,28px);
-      display:flex; gap:20px; align-items:center; justify-content:space-between;
-    }
-    .title{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    h1{margin:0; font-size: clamp(20px, 3.6vw, 34px); letter-spacing:.2px}
-    .subtitle{color:var(--muted); font-size:clamp(12px,1.6vw,14px)}
-
-    .layout{
-      flex:1; display:grid; gap:20px; padding:0 clamp(16px,3vw,28px) 28px;
-      grid-template-columns: 360px 1fr; 
-    }
-    @media (max-width: 980px){
-      .layout{ grid-template-columns: 1fr; }
-    }
-
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-    .panel{ padding:18px; }
-    .panel h2{ margin:0 0 10px; font-size:18px }
-    .hr{ height:1px; background: rgba(255,255,255,.08); margin:12px 0 }
-
-    /* Controls */
-    .controls{ display:grid; gap:14px }
-    .row{ display:grid; gap:8px }
-    label{ font-size:13px; color: var(--muted)}
-    input[type="number"], input[type="range"], select{
-      width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.1);
-      background:#0e1730; color:var(--text); outline:none;
-    }
-    input[type="range"]{ padding:0; height:28px }
-    .inline{
-      display:grid; grid-template-columns: 1fr 90px; gap:10px; align-items:center
-    }
-    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
-    .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px }
-
-    .btn{
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      border:none; color:#0c1326; font-weight:700; padding:12px 14px; border-radius:12px; cursor:pointer;
-      transition: transform .06s ease;
-    }
-    .btn:active{ transform: translateY(1px) }
-    .btn.secondary{
-      background: transparent; color: var(--text);
-      border:1px solid rgba(255,255,255,.15)
-    }
-
-    /* Output area */
-    .out-wrap{ display:grid; gap:20px }
-
-    .pyramid{
-      padding:14px; display:flex; flex-direction:column; gap:10px
-    }
-    .bar{ 
-      display:flex; align-items:center; gap:10px;
-    }
-    .bar-label{ width:170px; font-size:13px; color:var(--muted) }
-    .bar-rect{
-      --w: 100%; height:28px; width:var(--w);
-      background: linear-gradient(90deg, rgba(109,213,250,.25), rgba(41,128,185,.55));
-      border:1px solid rgba(109,213,250,.35);
-      border-radius: 999px; position:relative; overflow:hidden;
-    }
-    .bar-rect::after{
-      content:""; position:absolute; inset:0; background: linear-gradient(90deg, rgba(255,255,255,.06), transparent);
-    }
-    .bar-value{ min-width:88px; text-align:right; font-size:12px; color:#d7e6ff }
-
-    .legend{ display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--muted) }
-    .legend span{ padding:6px 8px; background:rgba(255,255,255,.05); border-radius:8px; border:1px solid rgba(255,255,255,.08) }
-
-    table{ width:100%; border-collapse:collapse; font-size:13px }
-    th,td{ text-align:right; padding:10px; border-bottom:1px dashed rgba(255,255,255,.07) }
-    th:first-child, td:first-child{ text-align:left }
-
-    .footer{ color:var(--muted); font-size:12px; padding:0 clamp(16px,3vw,28px) 24px }
-    .badge{ padding:6px 10px; border-radius:999px; font-size:11px; border:1px solid rgba(255,255,255,.12); color:#cfe9ff }
-
-    .note{ font-size:12px; color:var(--muted) }
+    body{margin:0;font-family:'Noto Sans KR',sans-serif;background:radial-gradient(1200px 800px at 80% -10%,rgba(109,213,250,.25),transparent 60%),radial-gradient(900px 700px at -20% 20%,rgba(41,128,185,.3),transparent 60%),var(--bg);color:var(--text);display:flex;flex-direction:column}
+    header{padding:24px clamp(16px,3vw,28px);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+    h1{margin:0;font-size:clamp(20px,3.6vw,34px)}
+    .layout{flex:1;display:grid;grid-template-columns:340px 1fr 320px;gap:20px;padding:0 clamp(16px,3vw,28px) 28px}
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:18px;overflow:auto}
+    h2{margin-top:0;font-size:18px}
+    label{font-size:13px;color:var(--muted)}
+    input,select{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:#0e1730;color:var(--text)}
+    .btn{background:linear-gradient(90deg,var(--accent2),var(--accent));border:none;color:#0c1326;padding:10px 14px;border-radius:12px;cursor:pointer}
+    .pyramid .bar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .bar-rect{height:24px;border-radius:999px;background:linear-gradient(90deg,rgba(109,213,250,.3),rgba(41,128,185,.5))}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.05)}
+    th:first-child,td:first-child{text-align:left}
+    /* 개념 영역 */
+    .concepts ul{padding-left:18px}
+    .concepts li{margin-bottom:8px;color:var(--muted);font-size:14px}
   </style>
 </head>
 <body>
-  <header>
-    <div class="title">
-      <h1>생태계 먹이사슬 비율 모델링 <span class="badge">Frontend Only</span></h1>
-      <div class="subtitle">영양단계별 에너지·생물량 비율을 슬라이더로 조절하고, 피라미드와 표로 즉시 시각화하세요.</div>
-    </div>
-    <div class="legend">
-      <span>에너지 단위: kcal·m<sup>−2</sup>·yr<sup>−1</sup> (가정)</span>
-      <span>기본 전이효율: 10%</span>
-    </div>
-  </header>
+<header>
+  <div>
+    <h1>🌿 생태계 먹이사슬 비율 모델링</h1>
+    <p style="color:var(--muted);font-size:14px">Ecosystem Food Chain Ratio Modeling — 영양 단계별 에너지 흐름을 시각화</p>
+  </div>
+</header>
+<main class="layout">
+  <!-- 좌측: 설정 -->
+  <section class="card">
+    <h2>모델 설정</h2>
+    <label>기초 생산 에너지 (kcal)</label>
+    <input type="number" id="baseEnergy" value="10000" min="1" max="1000000"><br><br>
+    <label>전이 효율 (%)</label>
+    <input type="number" id="efficiency" value="10" min="1" max="30"><br><br>
+    <label>영양 단계 수</label>
+    <input type="range" id="levels" min="2" max="6" value="4"><span id="lvlOut">4</span><br><br>
+    <button class="btn" id="run">계산하기</button>
+  </section>
 
-  <main class="layout">
-    <!-- LEFT: Controls -->
-    <section class="card panel">
-      <h2>모델 설정</h2>
-      <div class="controls">
-        <div class="row">
-          <label>에코시스템 프리셋</label>
-          <select id="preset">
-            <option value="custom">Custom (사용자 정의)</option>
-            <option value="grassland">초원 (효율~10%)</option>
-            <option value="forest">온대림 (효율~8%)</option>
-            <option value="lake">호수 (효율~12%)</option>
-            <option value="upwelling">해양 용승지역 (효율~15%)</option>
-          </select>
-        </div>
+  <!-- 중앙: 시각화 -->
+  <section class="card">
+    <h2>에너지 피라미드</h2>
+    <div id="pyramid" class="pyramid"></div>
+    <h2>결과 표</h2>
+    <table id="table">
+      <thead><tr><th>단계</th><th>에너지 (kcal)</th><th>전 단계 대비 (%)</th><th>누적 (%)</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-        <div class="grid-2">
-          <div class="row">
-            <label>기초 생산(1차 생산자) 에너지</label>
-            <div class="inline">
-              <input id="baseEnergy" type="number" min="1" max="1000000" value="10000" />
-              <span class="note">kcal</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>영양 단계 수 (2–6)</label>
-            <input id="levels" type="range" min="2" max="6" step="1" value="4" />
-          </div>
-        </div>
+  <!-- 우측: 개념 정리 -->
+  <aside class="card concepts">
+    <h2>📘 모델링 개념 정리</h2>
+    <ul>
+      <li><strong>생산자 (Producers):</strong> 광합성을 통해 에너지를 생성하는 생물 (예: 식물, 조류)</li>
+      <li><strong>소비자 (Consumers):</strong> 다른 생물을 먹어 에너지를 얻는 생물 (1차, 2차, 3차 등)</li>
+      <li><strong>전이 효율 (Transfer Efficiency):</strong> 한 단계에서 다음 단계로 전달되는 에너지 비율 (보통 10%)</li>
+      <li><strong>생물량 (Biomass):</strong> 특정 단계에 존재하는 생물들의 총 질량</li>
+      <li><strong>에너지 피라미드 (Energy Pyramid):</strong> 각 단계의 에너지를 시각적으로 나타낸 도표</li>
+      <li><strong>10% 법칙 (10% Law):</strong> 에너지 전달 시 약 10%만 다음 단계로 이동</li>
+      <li><strong>동적 모델 (Dynamic Model):</strong> 시간에 따라 변화하는 먹이사슬 관계를 시뮬레이션하는 수학적 모델</li>
+      <li><strong>충격 시나리오 (Perturbation):</strong> 특정 단계의 감소가 상위 단계에 미치는 파급 효과를 관찰</li>
+    </ul>
+  </aside>
+</main>
+<script>
+const pyramid=document.getElementById('pyramid');
+const tableBody=document.querySelector('#table tbody');
+const baseEnergy=document.getElementById('baseEnergy');
+const efficiency=document.getElementById('efficiency');
+const levels=document.getElementById('levels');
+const lvlOut=document.getElementById('lvlOut');
+levels.addEventListener('input',()=>lvlOut.textContent=levels.value);
 
-        <div class="row">
-          <label>전이 효율 모드</label>
-          <select id="effMode">
-            <option value="global">단일 효율 (모든 단계 동일)</option>
-            <option value="perlevel">단계별 개별 효율</option>
-          </select>
-        </div>
+document.getElementById('run').addEventListener('click',()=>{
+  const base=Number(baseEnergy.value);
+  const eff=Number(efficiency.value)/100;
+  const L=Number(levels.value);
+  let energies=[base];
+  for(let i=1;i<L;i++) energies[i]=energies[i-1]*eff;
 
-        <div id="globalEffWrap" class="row">
-          <label>전이 효율 (생산자→최상위까지 공통, %)</label>
-          <div class="inline">
-            <input id="globalEff" type="range" min="1" max="30" value="10" />
-            <input id="globalEffNum" type="number" min="1" max="30" value="10" />
-          </div>
-        </div>
+  const maxE=Math.max(...energies);
+  pyramid.innerHTML='';
+  for(let i=L-1;i>=0;i--){
+    const bar=document.createElement('div');
+    bar.className='bar';
+    const label=document.createElement('div');label.style.width='140px';label.textContent=i===0?'생산자':i+'차 소비자';
+    const rect=document.createElement('div');rect.className='bar-rect';rect.style.width=(energies[i]/maxE*100)+'%';
+    const val=document.createElement('div');val.textContent=energies[i].toFixed(0)+' kcal';
+    bar.append(label,rect,val);pyramid.appendChild(bar);
+  }
 
-        <div id="perLevelEffWrap" class="row" style="display:none">
-          <label>단계별 전이 효율 (%) — (생산자→1차, 1차→2차 …)</label>
-          <div id="effList" class="grid-3"></div>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="row">
-          <label>충격(perturbation) 시나리오 — 특정 단계 생물량 감소</label>
-          <div class="grid-3">
-            <select id="shockLevel"></select>
-            <input id="shockPct" type="range" min="0" max="90" value="0" />
-            <input id="shockPctNum" type="number" min="0" max="90" value="0" />
-          </div>
-          <div class="note">선택한 단계의 현재 값에서 <strong id="shockOut">0%</strong> 감소로 가정하여 간단한 비례 파급효과를 계산합니다.</div>
-        </div>
-
-        <div class="hr"></div>
-        <div class="grid-2">
-          <button class="btn" id="run">계산 / 시각화</button>
-          <button class="btn secondary" id="exportJson">설정 내보내기 (JSON)</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- RIGHT: Outputs -->
-    <section class="out-wrap">
-      <div class="card panel">
-        <h2>에너지 피라미드</h2>
-        <div id="pyramid" class="pyramid"></div>
-      </div>
-
-      <div class="card panel">
-        <h2>계산표 (에너지 & 전이 비율)</h2>
-        <div style="overflow:auto">
-          <table id="table">
-            <thead>
-              <tr>
-                <th>영양 단계</th>
-                <th>단계명</th>
-                <th>에너지 (kcal)</th>
-                <th>전 단계 대비 비율 (%)</th>
-                <th>생산자 대비 누적 비율 (%)</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="footer">
-        참고: 단순한 정적 비율 모델입니다(전이효율 가정). 실제 생태계의 동역학(로트카-볼테라 등)과는 다를 수 있습니다.
-      </div>
-    </section>
-  </main>
-
-  <script>
-    // ------------------------------
-    // Utilities
-    // ------------------------------
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const clamp = (v,min,max)=> Math.min(max, Math.max(min, v));
-    const fmt = (n, d=0) => Number(n).toLocaleString(undefined,{maximumFractionDigits:d, minimumFractionDigits:d});
-
-    // ------------------------------
-    // Elements
-    // ------------------------------
-    const baseEnergy = $('#baseEnergy');
-    const levels = $('#levels');
-    const effMode = $('#effMode');
-    const globalEff = $('#globalEff');
-    const globalEffNum = $('#globalEffNum');
-    const globalEffWrap = $('#globalEffWrap');
-    const perLevelEffWrap = $('#perLevelEffWrap');
-    const effList = $('#effList');
-
-    const preset = $('#preset');
-
-    const shockLevel = $('#shockLevel');
-    const shockPct = $('#shockPct');
-    const shockPctNum = $('#shockPctNum');
-    const shockOut = $('#shockOut');
-
-    const runBtn = $('#run');
-    const exportBtn = $('#exportJson');
-    const pyramid = $('#pyramid');
-    const tableBody = $('#table tbody');
-
-    // ------------------------------
-    // State
-    // ------------------------------
-    const state = {
-      L: Number(levels.value),
-      globalEff: Number(globalEff.value), // %
-      perEff: [], // per-step % (length L-1)
-    };
-
-    const levelNames = [
-      '생산자 (Producers)',
-      '1차 소비자 (Primary)',
-      '2차 소비자 (Secondary)',
-      '3차 소비자 (Tertiary)',
-      '4차 소비자 (Quaternary)',
-      '5차 소비자 (Quinary)'
-    ];
-
-    // ------------------------------
-    // Build per-level efficiency inputs
-    // ------------------------------
-    function buildPerLevelEff(){
-      effList.innerHTML = '';
-      state.L = Number(levels.value);
-      const steps = state.L - 1;
-      if(!state.perEff.length || state.perEff.length !== steps){
-        state.perEff = Array.from({length: steps}, (_,i)=> state.globalEff);
-      }
-      for(let i=0;i<steps;i++){
-        const wrap = document.createElement('div');
-        wrap.className = 'row';
-        wrap.innerHTML = `
-          <label>${i===0? '생산자→1차' : `${i}차→${i+1}차`} (%)</label>
-          <input type="range" min="1" max="30" value="${state.perEff[i]}" data-idx="${i}" />
-        `;
-        effList.appendChild(wrap);
-      }
-    }
-
-    // ------------------------------
-    // Presets
-    // ------------------------------
-    const PRESETS = {
-      custom: null,
-      grassland: { globalEff: 10, L: 4, baseEnergy: 9000 },
-      forest:    { globalEff: 8,  L: 4, baseEnergy: 8000 },
-      lake:      { globalEff: 12, L: 4, baseEnergy: 11000 },
-      upwelling: { globalEff: 15, L: 5, baseEnergy: 15000 },
-    };
-
-    preset.addEventListener('change', ()=>{
-      const p = PRESETS[preset.value];
-      if(!p){ return; }
-      globalEff.value = globalEffNum.value = p.globalEff;
-      levels.value = p.L;
-      baseEnergy.value = p.baseEnergy;
-      state.globalEff = p.globalEff;
-      state.L = p.L;
-      buildPerLevelEff();
-      fillShockOptions();
-      computeAndRender();
-    });
-
-    // ------------------------------
-    // Sync controls
-    // ------------------------------
-    levels.addEventListener('input', ()=>{ buildPerLevelEff(); fillShockOptions(); });
-    effMode.addEventListener('change', ()=>{
-      const mode = effMode.value;
-      globalEffWrap.style.display = (mode==='global')? 'block':'none';
-      perLevelEffWrap.style.display = (mode==='perlevel')? 'block':'none';
-      buildPerLevelEff();
-    });
-
-    globalEff.addEventListener('input', ()=>{ globalEffNum.value = globalEff.value; state.globalEff = Number(globalEff.value); buildPerLevelEff(); });
-    globalEffNum.addEventListener('input', ()=>{ const v = clamp(Number(globalEffNum.value),1,30); globalEff.value = v; state.globalEff = v; buildPerLevelEff(); });
-
-    effList.addEventListener('input', (e)=>{
-      if(e.target.matches('input[type="range"]')){
-        const i = Number(e.target.dataset.idx);
-        state.perEff[i] = Number(e.target.value);
-      }
-    });
-
-    function fillShockOptions(){
-      shockLevel.innerHTML = '';
-      const L = Number(levels.value);
-      for(let i=0;i<L;i++){
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${i===0?'생산자':' '+i+'차 소비자'}`;
-        shockLevel.appendChild(opt);
-      }
-    }
-
-    shockPct.addEventListener('input', ()=>{ shockPctNum.value = shockPct.value; shockOut.textContent = shockPct.value+"%"; });
-    shockPctNum.addEventListener('input', ()=>{ const v = clamp(Number(shockPctNum.value),0,90); shockPct.value = v; shockOut.textContent = v+"%"; });
-
-    // ------------------------------
-    // Core: compute energies by level
-    // ------------------------------
-    function computeEnergies(){
-      const L = Number(levels.value);
-      const E0 = Math.max(1, Number(baseEnergy.value||0));
-      let energies = Array(L).fill(0); energies[0]=E0;
-
-      if(effMode.value==='global'){
-        const eff = Number(globalEff.value)/100; // fraction
-        for(let i=1;i<L;i++) energies[i] = energies[i-1]*eff;
-      } else {
-        const effs = state.perEff.map(v=>v/100);
-        for(let i=1;i<L;i++) energies[i] = energies[i-1] * (effs[i-1] ?? (Number(globalEff.value)/100));
-      }
-
-      // Apply shock as proportional reduction to chosen level and propagate upward simply
-      const sIdx = Number(shockLevel.value||0);
-      const sPct = Number(shockPct.value||0)/100; // reduce by sPct
-      if(sPct>0){
-        energies[sIdx] *= (1 - sPct);
-        for(let i=sIdx+1;i<L;i++){
-          // propagate proportionally (simple assumption)
-          energies[i] = energies[i-1] * (effMode.value==='global' ? Number(globalEff.value)/100 : (state.perEff[i-1]/100));
-        }
-      }
-      return energies;
-    }
-
-    // ------------------------------
-    // Render pyramid bars & table
-    // ------------------------------
-    function render(energies){
-      // Bars scaled to max of level 0
-      const maxE = Math.max(...energies);
-      pyramid.innerHTML = '';
-      const L = energies.length;
-      for(let i=L-1; i>=0; i--){ // top to bottom visually
-        const wrap = document.createElement('div');
-        wrap.className = 'bar';
-        const label = document.createElement('div');
-        label.className = 'bar-label';
-        label.textContent = i===0? levelNames[0] : levelNames[i];
-        const rect = document.createElement('div');
-        rect.className = 'bar-rect';
-        const widthPct = (energies[i]/maxE)*100;
-        rect.style.setProperty('--w', widthPct.toFixed(2)+'%');
-        const value = document.createElement('div');
-        value.className = 'bar-value';
-        value.textContent = fmt(energies[i],0)+ ' kcal';
-        wrap.append(label, rect, value);
-        pyramid.appendChild(wrap);
-      }
-
-      // Table
-      tableBody.innerHTML = '';
-      for(let i=0;i<L;i++){
-        const tr = document.createElement('tr');
-        const rel = i===0? 100 : (energies[i]/energies[i-1])*100;
-        const cum = (energies[i]/energies[0])*100;
-        tr.innerHTML = `
-          <td>${i}</td>
-          <td>${i===0? levelNames[0] : levelNames[i]}</td>
-          <td>${fmt(energies[i],0)}</td>
-          <td>${i===0? '-' : fmt(rel,2)}</td>
-          <td>${fmt(cum,2)}</td>
-        `;
-        tableBody.appendChild(tr);
-      }
-    }
-
-    // ------------------------------
-    // Export JSON
-    // ------------------------------
-    function exportJSON(){
-      const data = {
-        baseEnergy: Number(baseEnergy.value),
-        levels: Number(levels.value),
-        mode: effMode.value,
-        globalEff: Number(globalEff.value),
-        perEff: state.perEff,
-        shock: { level: Number(shockLevel.value), pct: Number(shockPct.value) }
-      };
-      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'food_chain_model.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    // ------------------------------
-    // Wiring
-    // ------------------------------
-    function computeAndRender(){
-      const energies = computeEnergies();
-      render(energies);
-    }
-
-    runBtn.addEventListener('click', computeAndRender);
-    exportBtn.addEventListener('click', exportJSON);
-
-    // Initial setup
-    buildPerLevelEff();
-    fillShockOptions();
-    computeAndRender();
-  </script>
+  tableBody.innerHTML='';
+  for(let i=0;i<L;i++){
+    const prev=i===0?energies[0]:energies[i-1];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i===0?'생산자':i+'차 소비자'}</td><td>${energies[i].toFixed(0)}</td><td>${i===0?'-':(energies[i]/prev*100).toFixed(2)}</td><td>${(energies[i]/energies[0]*100).toFixed(2)}</td>`;
+    tableBody.appendChild(tr);
+  }
+});
+</script>
 </body>
 </html>
